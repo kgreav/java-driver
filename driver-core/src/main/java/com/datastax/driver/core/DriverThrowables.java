@@ -22,11 +22,11 @@ import java.util.concurrent.ExecutionException;
 
 class DriverThrowables {
 
-    static RuntimeException propagateCause(ExecutionException e) {
+    static Throwable propagateCause(ExecutionException e) {
         Throwable cause = e.getCause();
 
         if (cause instanceof Error)
-            throw ((Error) cause);
+            return ((Error) cause);
 
         // We could just rethrow e.getCause(). However, the cause of the ExecutionException has likely been
         // created on the I/O thread receiving the response. Which means that the stacktrace associated
@@ -34,8 +34,8 @@ class DriverThrowables {
         // out which execute() statement actually raised the exception. So instead, we re-create the
         // exception.
         if (cause instanceof DriverException)
-            throw ((DriverException) cause).copy();
+            return ((DriverException) cause).copy();
         else
-            throw new DriverInternalError("Unexpected exception thrown", cause);
+            return new DriverInternalError("Unexpected exception thrown", cause);
     }
 }
